@@ -92,10 +92,10 @@ struct Graph {
   }
 
 
-  void InfectLeaves(vector<int>& infected_towns) {
+  void InfectLeavesAndIsolated(vector<int>& infected_towns) {
         for (int cur_v = 0;  cur_v <= am_ver; cur_v += 1) {
         // cout << "Now is" << cur_v << "\n";
-            if (g[cur_v].size() == 1) {
+            if (g[cur_v].size() == 1 || g[cur_v].size() == 0) {
             // cout << cur_v << " is infected\n";
                 infected_towns.push_back(cur_v);
                 InfectTown(cur_v, infected_towns);
