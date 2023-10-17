@@ -4,7 +4,6 @@
 #include <set>
 
 
-// size_t max_input_size = 1e8;
 size_t max_input_size = 1e4;
 
 template<typename T>
@@ -25,7 +24,6 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& arr) {
   return os;
 }
 
-using namespace std;
 struct Graph {
  public:
   Graph(int n, int m) : am_ver(n), am_edges(m) {
@@ -33,8 +31,7 @@ struct Graph {
     InputGraph();
   }
 
-    void InfectTown(int cur_v, vector<int>& infected_towns) {
-        // not_infected.erase(cur_v);
+    void InfectTown(int cur_v, std::vector<int>& infected_towns) {
         if (is_infected[cur_v] == true) {
             return;
         }
@@ -54,7 +51,7 @@ struct Graph {
         int cur_best_candiate = 0;
         int cur_best_amount_of_not_infected_neihbors = -1;
 
-        for (int cur_v = 0;  cur_v <= am_ver; cur_v += 1) {
+        for (int cur_v = min_ver;  cur_v <= am_ver; cur_v += 1) {
             if (is_infected[cur_v] || (g[cur_v].size() == 0)) {
                 continue;
             } else {
@@ -68,10 +65,9 @@ struct Graph {
         return std::pair(is_all_infected, cur_best_candiate);
     }
 
-    void IterationsOfTakeMostConnectedWithNotInfectedTown(vector<int>& infected_towns) {
+    void IterationsOfTakeMostConnectedWithNotInfectedTown(std::vector<int>& infected_towns) {
         while (true) {
             auto [is_all_infected, best_candidate] = FindBestCandidate();
-            // cout << is_all_infected << " " << best_candidate << "\n";
             if (is_all_infected == true) {
                 return;
             }
@@ -80,23 +76,18 @@ struct Graph {
         }
     }
 
-  vector<int> FindMinAmountOfInfectedTowns() {
-    vector<int> infected_towns;
+  std::vector<int> FindMinAmountOfInfectedTowns() {
+    std::vector<int> infected_towns;
     CountNeighbors();
-    // cout << "End CountNeighbors\n";
-    InfectLeaves(infected_towns);
-    // cout << "End InfectLeaves\n";
+    InfectLeavesAndIsolated(infected_towns);
     IterationsOfTakeMostConnectedWithNotInfectedTown(infected_towns);
-    // cout << "End main work cycle\n";
     return infected_towns;
   }
 
 
-  void InfectLeavesAndIsolated(vector<int>& infected_towns) {
-        for (int cur_v = 0;  cur_v <= am_ver; cur_v += 1) {
-        // cout << "Now is" << cur_v << "\n";
+  void InfectLeavesAndIsolated(std::vector<int>& infected_towns) {
+        for (int cur_v = min_ver;  cur_v <= am_ver; cur_v += 1) {
             if (g[cur_v].size() == 1 || g[cur_v].size() == 0) {
-            // cout << cur_v << " is infected\n";
                 infected_towns.push_back(cur_v);
                 InfectTown(cur_v, infected_towns);
             }
@@ -105,33 +96,32 @@ struct Graph {
     }
 
     void CountNeighbors() {
-        for (int cur_v = 0;  cur_v <= am_ver; cur_v += 1) {
+        for (int cur_v = min_ver;  cur_v <= am_ver; cur_v += 1) {
             how_much_neighbors_not_infected[cur_v] = g[cur_v].size();
             how_much_neighbors_infected[cur_v] = 0;
-            // cout << "for v: " << cur_v << " there are " << how_much_neighbors_not_infected[cur_v] << "negbors\n";
         }
     }
 
  private:
+    int64_t min_ver = 1e8;
     int64_t am_ver;
     int64_t am_edges;
-    vector<vector<int>> g;
+    std::vector<std::vector<int>> g;
     std::vector<int> how_much_neighbors_infected;
     std::vector<int> how_much_neighbors_not_infected;
-    vector<bool> is_infected;
+    std::vector<bool> is_infected;
 
 
     void InputGraph() {
         am_ver = 0;
         int64_t from, to;
         for (size_t i = 0; i < am_edges; ++i) {
-            // cout << i;
-            cin >> from >> to;
+            std::cin >> from >> to;
             g[from].push_back(to);
             g[to].push_back(from);
             am_ver = std::max(am_ver, std::max(from, to));
+            min_ver = std::min(min_ver, std::min(from, to));
         }
-        // cout << "End input Graph\n" << am_ver << " is max vert\n";
         is_infected.resize(am_ver + 1, false);
         how_much_neighbors_not_infected.resize(am_ver + 1);
         how_much_neighbors_infected.resize(am_ver + 1);
@@ -140,10 +130,10 @@ struct Graph {
 
 int main() {
     int am_edges;
-    cin >> am_edges;
+    std::cin >> am_edges;
     Graph my_graph(max_input_size, am_edges);
      
     auto min_infected_towns = my_graph.FindMinAmountOfInfectedTowns();
-    cout << min_infected_towns.size() << "\n" << min_infected_towns;
+    std::cout << min_infected_towns.size() << "\n" << min_infected_towns;
     return 0;
 }
